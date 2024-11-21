@@ -4,6 +4,7 @@ local CoreGui = game:GetService("CoreGui") or game:GetService("Players").LocalPl
 local DrawingHolder = Instance.new("ScreenGui", CoreGui);
 local CurrentCamera = game:GetService("Workspace").CurrentCamera;
 
+
 -- Drawing
 getgenv().DMDrawing = {
 	Font = "Code",
