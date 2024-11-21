@@ -503,7 +503,7 @@ local function DrawText(Properties)
 end;
 
 
-function DMDrawing.new(Type, Properties)
+function DMDrawing:new(Type, Properties)
 
 	if Type == "Line" then
 		return DrawLine(Properties);
@@ -517,7 +517,7 @@ function DMDrawing.new(Type, Properties)
 
 end;
 
-function DMDrawing.Fonts(Type) -- I Am To Lazy To Add Anything Else
+function DMDrawing:Fonts(Type) -- I Am To Lazy To Add Anything Else
 	if typeof(Type) == "string" then
 		DMDrawing.Font = Type;
 	else
