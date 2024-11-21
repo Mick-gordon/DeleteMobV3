@@ -6,7 +6,7 @@ local CurrentCamera = game:GetService("Workspace").CurrentCamera;
 
 
 -- Drawing
-getgenv().DMDrawing = {
+local DMDrawing = {
 	Font = "Code",
 }
 do
@@ -529,3 +529,5 @@ do
 
 
 end;
+
+return DMDrawing;
