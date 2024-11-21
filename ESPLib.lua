@@ -504,7 +504,7 @@ do
 	end;
 
 
-	function DMDrawing.new(Type, Properties)
+	function getgenv().DMDrawing.new(Type, Properties)
 
 		if Type == "Line" then
 			return DrawLine(Properties);
@@ -518,7 +518,7 @@ do
 
 	end;
 	
-	function DMDrawing.Fonts(Type) -- I Am To Lazy To Add Anything Else
+	function getgenv().DMDrawing.Fonts(Type) -- I Am To Lazy To Add Anything Else
 		if typeof(Type) == "string" then
 			DMDrawing.Font = Type;
 		else
