@@ -5,7 +5,7 @@ local DrawingHolder = Instance.new("ScreenGui", CoreGui);
 local CurrentCamera = game:GetService("Workspace").CurrentCamera;
 
 -- Drawing
-local DMDrawing = {
+getgenv().DMDrawing = {
 	Font = "Code",
 }
 do
@@ -504,7 +504,7 @@ do
 	end;
 
 
-	function getgenv().DMDrawing.new(Type, Properties)
+	function DMDrawing.new(Type, Properties)
 
 		if Type == "Line" then
 			return DrawLine(Properties);
@@ -518,7 +518,7 @@ do
 
 	end;
 	
-	function getgenv().DMDrawing.Fonts(Type) -- I Am To Lazy To Add Anything Else
+	function DMDrawing.Fonts(Type) -- I Am To Lazy To Add Anything Else
 		if typeof(Type) == "string" then
 			DMDrawing.Font = Type;
 		else
