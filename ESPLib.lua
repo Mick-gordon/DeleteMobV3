@@ -269,6 +269,100 @@ do
 		});
 		return MT
 	end;
+	
+	local function DrawCircle(Properties)
+		local CircleProperties = {
+			Visible = true,
+			ZIndex = 0,
+			Transparency = 0,
+			Color = Color3.fromRGB(255, 255, 255),
+			Thickness = 1,
+			Filled = false,
+			Position = Vector2.new(0, 0),
+			Radius = 10,
+		};
+
+		for i,v in next, Properties do
+			CircleProperties[i] = v
+		end;
+		
+		local Fill = Instance.new("Frame", DrawingHolder);
+		Fill.Size = UDim2.fromOffset(CircleProperties.Radius + CircleProperties.Radius/2 - CircleProperties.Thickness, CircleProperties.Radius + CircleProperties.Radius/2 - CircleProperties.Thickness);
+		Fill.Transparency = (CircleProperties.Filled and CircleProperties.Transparency or CircleProperties.Filled ~= true and 1);
+		Fill.Visible = CircleProperties.Visible;
+		Fill.BackgroundColor3 = CircleProperties.Color;
+		Fill.AnchorPoint = Vector2.new(.5, .5);
+		Fill.Position = UDim2.fromOffset(CircleProperties.Position.X, CircleProperties.Position.Y);
+		
+		local UICorner = Instance.new("UICorner", Fill);
+		UICorner.CornerRadius = UDim.new(1, 0);
+		
+		local Circumference = Instance.new("UIStroke", Fill);
+		Circumference.Color = CircleProperties.Color;
+		Circumference.Thickness = CircleProperties.Thickness;
+
+		local MT = setmetatable({}, {
+			__newindex = (function(self, Property, Value)
+				
+				if Property == "Visible" then
+					
+					CircleProperties.Visible = Value;
+					Fill.Visible = CircleProperties.Visible;
+					
+				elseif Property == "Color" then
+					
+					CircleProperties.Color = Value;
+					Fill.BackgroundColor3 = CircleProperties.Color;
+					Circumference.Color = CircleProperties.Color;
+					
+				elseif Property == "Thickness" and CircleProperties.Filled ~= true then
+					
+					CircleProperties.Thickness = Value;
+					Circumference.Thickness = CircleProperties.Thickness;
+					
+				elseif Property == "Position" then
+					
+					CircleProperties.Position = Value;
+					Fill.Position = UDim2.fromOffset(CircleProperties.Position.X, CircleProperties.Position.Y);
+					
+				elseif Property == "Radius" then
+					
+					CircleProperties.Radius = Value;
+					Fill.Size = UDim2.fromOffset(CircleProperties.Radius + CircleProperties.Radius/2 - CircleProperties.Thickness, CircleProperties.Radius + CircleProperties.Radius/2 - CircleProperties.Thickness);
+					
+				elseif Property == "Transparency" then
+					
+					CircleProperties.Transparency = Value;
+					Fill.Transparency = (CircleProperties.Filled and CircleProperties.Transparency or CircleProperties.Filled ~= true and 1);
+					Circumference.Transparency = CircleProperties.Transparency;
+				
+				elseif Property == "ZIndex" then
+					
+					CircleProperties.ZIndex = Value;
+					Fill.ZIndex = CircleProperties.ZIndex;
+				
+				elseif Property == "Filled" then
+					
+					CircleProperties.Filled = Value;
+					Fill.Transparency = (CircleProperties.Filled and CircleProperties.Transparency or CircleProperties.Filled ~= true and 1);
+				
+				end;
+
+			end),
+			__index = (function(self, Property)
+				if Property == "Remove" then
+					return (function()
+						Fill:Destroy();
+						UICorner:Destroy();
+						Circumference:Destroy();
+					end);
+				end;
+
+				return CircleProperties[Property];
+			end);
+		});
+		return MT
+	end;
 
 
 	function DMDrawing.new(Type, Properties)
@@ -277,98 +371,11 @@ do
 			return DrawLine(Properties);
 		elseif Type == "Box" then
 			return DrawBox(Properties);
+		elseif Type == "Circle" then
+			return DrawCircle(Properties)
 		end;
 
 	end;
 
-
-end;
-
-
-local Players = game:GetService("Players");
-local LocalPlayer = Players.LocalPlayer;
-local CurrentCamera = game:GetService("Workspace").CurrentCamera;
-local RunService = game:GetService("RunService");
-
-local ESP = {
-	Enabled = true,
-
-	Tracers = {
-		Enabled = true,
-		Color = Color3.fromRGB(255, 0, 0),
-		Thickness = 2,
-		Transparency = 0,
-	},
-	Box ={
-		Enabled = true,
-		Color = Color3.fromRGB(255, 0, 0),
-		Thickness = 2,
-	}
-};
-do
-
-	local function CreateESP(Player)
-		local Connection
-		local Tracer = DMDrawing.new("Line", {Visible = false, Color = Color3.fromRGB(0, 0, 0), Thickness = 1, Transparency = 0.2});
-		local Box = DMDrawing.new("Box", {Filled = false, Visible = false});
-
-		local function HideESP()
-			Tracer.Visible = false;
-			Box.Visible = false;
-		end;
-
-		local function DestroyESP()
-			Tracer:Remove();
-			Box:Remove();
-			Connection:Disconnect();
-		end;
-
-		Connection = RunService.Heartbeat:Connect(function()
-			if not Player then
-				return DestroyESP();
-			end;
-
-			if not Player.Character or not Player.Character:FindFirstChild("HumanoidRootPart") or not Player.Character:FindFirstChild("Humanoid") or Player.Character.Humanoid.Health < 0 then
-				return HideESP();
-			end;
-
-			local ScreenPosition, Onscreen = CurrentCamera:WorldToScreenPoint(Player.Character.HumanoidRootPart.Position)
-			if not Onscreen then
-				return HideESP();
-			end;
-
-			local frustumHeight = math.tan(math.rad(CurrentCamera.FieldOfView * 0.5)) * 2 * ScreenPosition.Z; 
-			local size = CurrentCamera.ViewportSize.Y / frustumHeight * Vector2.new(5,6);
-			local position = Vector2.new(ScreenPosition.X, ScreenPosition.Y) - size / 2;
-			--local TopTextY = (ScreenPosition.Y - (size.Y + Name.TextBounds.Y + 19) / 2);
-
-			Tracer.Visible = ESP.Enabled and ESP.Tracers.Enabled;
-			if Tracer.Visible then
-				Tracer.To = Vector2.new(ScreenPosition.X, ScreenPosition.Y);
-				Tracer.From = Vector2.new(CurrentCamera.ViewportSize.X/2, CurrentCamera.ViewportSize.Y);
-				Tracer.Color = ESP.Tracers.Color;
-				Tracer.Transparency = ESP.Tracers.Transparency;
-				Tracer.Thickness = ESP.Tracers.Thickness;
-			end;
-			
-			Box.Visible = ESP.Enabled and ESP.Box.Enabled;
-			if Box.Visible then
-				Box.Position = position;
-				Box.Size = size;
-				Box.Color = ESP.Box.Color;
-			end;
-
-		end);
-	end;
-
-	for i,v in pairs(Players:GetPlayers()) do
-		if v~=LocalPlayer then
-			CreateESP(v);
-		end;
-	end;
-
-	Players.PlayerAdded:Connect(function(v)
-		CreateESP(v);
-	end);
 
 end;
