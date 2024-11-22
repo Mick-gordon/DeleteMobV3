@@ -522,4 +522,4 @@ function DMDrawing:Fonts(Type) -- I Am To Lazy To Add Anything Else
 end;
 
 
-return DMDrawing;
+return {Drawing = DMDrawing};
